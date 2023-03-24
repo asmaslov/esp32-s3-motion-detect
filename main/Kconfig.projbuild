@@ -1,0 +1,65 @@
+menu "Project Configuration"
+
+    choice UART_NUM
+        prompt "UART number"
+        default UART_NUM_0
+        help
+            Defines the UART port for accelerometer data output.
+
+        config UART_NUM_0
+            bool "UART 0"
+        config UART_NUM_1
+            bool "UART 1"
+    endchoice
+
+    config UART_RX_PIN
+        int "RX GPIO number"
+        default 44
+        help
+            GPIO number for UART RX line.
+
+    config UART_TX_PIN
+        int "TX GPIO number"
+        default 43
+        help
+            GPIO number for UART TX line.
+
+    config UART_RX_BUFFER_SIZE
+        int "RX buffer size"
+        default 2048
+        help
+            UART RX buffer size.
+
+    config UART_TX_BUFFER_SIZE
+        int "TX buffer size"
+        default 2048
+        help
+            UART TX buffer size.
+
+    config I2C_MASTER_SCL_PIN
+        int "SCL GPIO number"
+        default 5
+        help
+            GPIO number for I2C Master clock line.
+
+    config I2C_MASTER_SDA_PIN
+        int "SDA GPIO number"
+        default 4
+        help
+            GPIO number for I2C Master data line.
+
+    config BLINK_GPIO_PIN
+        int "Blink GPIO number"
+        range 0 48
+        default 3
+        help
+            GPIO number to blink LED on and off while accelerometer is active.
+
+    config DATA_PERIOD_MS
+        int "Data transmit period in ms"
+        range 10 3600000
+        default 10
+        help
+            Define the accelerometer data transmit period in milliseconds.
+
+endmenu
