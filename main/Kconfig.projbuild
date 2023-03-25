@@ -1,5 +1,17 @@
 menu "Project Configuration"
 
+    choice MODE
+        prompt "Operation mode"
+        default MODE_COLLECT
+        help
+            Defines the operation mode.
+
+        config MODE_COLLECT
+            bool "Collect data"
+        config MODE_PREDICT
+            bool "Predict"
+    endchoice
+
     choice UART_NUM
         prompt "UART number"
         default UART_NUM_0
