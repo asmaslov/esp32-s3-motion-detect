@@ -55,6 +55,11 @@ typedef int16_t sample_t;
 #define DSP_INPUT_BLOCK_SIZE  60
 #define DSP_INPUT_BLOCK_NUM  (EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE / DSP_INPUT_BLOCK_SIZE)
 
+#define BLINK_OFF_PERIOD_MS          3000
+#define BLINK_LIGHT_LOAD_PERIOD_MS   1000
+#define BLINK_MEDIUM_LOAD_PERIOD_MS  500
+#define BLINK_HEAVY_LOAD_PERIOD_MS   250
+
 /* I2C */
 
 esp_err_t i2c_master_init(void) {
@@ -182,6 +187,8 @@ esp_err_t led_blink(void) {
 
 static sample_t acc_x, acc_y, acc_z;
 SemaphoreHandle_t mutex_acc, semaphore_save, semaphore_detect;
+TickType_t blink_period[] = {BLINK_HEAVY_LOAD_PERIOD_MS, BLINK_LIGHT_LOAD_PERIOD_MS, BLINK_MEDIUM_LOAD_PERIOD_MS, BLINK_OFF_PERIOD_MS};
+TickType_t current_blink_period;
 
 void task_get_acc(void *arg) {
     uint8_t data[2];
@@ -321,12 +328,20 @@ void task_detect(void *arg)
         ESP_LOGD(tag, "Timing: DSP %d ms, inference %d ms, anomaly %d ms\r\n", 
                  result.timing.dsp, result.timing.classification, result.timing.anomaly);
 
+        size_t max_idx;
+        float max = 0;
         printf("Predictions:\r\n");
         for (size_t i = 0; i < EI_CLASSIFIER_LABEL_COUNT; i++) {
             printf("  %s: ", ei_classifier_inferencing_categories[i]);
             printf("%.5f\r\n", result.classification[i].value);
+            if (result.classification[i].value > max) {
+                max = result.classification[i].value;
+                max_idx = i;
+            }
         }
         printf("Anomaly prediction: %.3f\r\n", result.anomaly);
+
+        current_blink_period = blink_period[max_idx];
 
         xSemaphoreGive(semaphore_save);
     }
@@ -339,6 +354,11 @@ extern "C" void app_main(void)
     ESP_ERROR_CHECK(uart_init());
     ESP_ERROR_CHECK(led_init());
 
+#if defined(CONFIG_MODE_COLLECT)
+    current_blink_period = TASK_HEARTBEAT_PERIOD_MS;
+#elif defined(CONFIG_MODE_PREDICT)
+    current_blink_period = BLINK_OFF_PERIOD_MS;
+#endif
     mutex_acc = xSemaphoreCreateMutex();
     semaphore_save = xSemaphoreCreateBinary();
     semaphore_detect = xSemaphoreCreateBinary();
@@ -351,6 +371,6 @@ extern "C" void app_main(void)
 
     while (1) {
         led_blink();
-        vTaskDelay(TASK_HEARTBEAT_PERIOD_MS / 2 / portTICK_PERIOD_MS);
+        vTaskDelay(current_blink_period / 2 / portTICK_PERIOD_MS);
     }
 }
