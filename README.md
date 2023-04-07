@@ -1,9 +1,7 @@
 # ESP32-S3 Motion Detect
-
 Based on ESP32-S3 development board with QMA7981.
 
 ## Overview
-
 Used [ESP32-S3-EYE v2.2](https://github.com/espressif/esp-who/blob/master/docs/en/get-started/ESP32-S3-EYE_Getting_Started_Guide.md) development kit without LCD module.
 
 Used Edge Impulse model [industrial-motion-classifier](https://studio.edgeimpulse.com/public/201134/latest) trained to detect by vibration several washing mashine states: off, light-load, medium-load and high-load.
@@ -13,7 +11,7 @@ Accelerometer data is collected with QMA7981 and transmitted to UART.
 Firmware has 2 operation modes. Mode can be selected in `Project Configuration` in `menuconfig`
 
 ### Data collection
-Values are directly printed to the debug console for further transmitting to Edge Impulse platform.
+Values are directly printed to the debug console for further transmitting to Edge Impulse platform.  
 Launch `edge-impulse-data-forwarder` for data collection.
 
 #### Example output
@@ -39,9 +37,8 @@ Predictions:
 Anomaly prediction: -0.487
 ```
 
-## Pin Assignment:
-
-**Note:** The following pin assignments are used by default, you can change these in the `menuconfig` .
+## Pin Assignment
+**Note:** The following pin assignments are used by default, you can change these in the `menuconfig`.
 
 | I2C              | SDA                | SCL                |
 | ---------------- | ------------------ | ------------------ |
@@ -57,9 +54,11 @@ For the actual default value of `I2C_MASTER_SDA`, `I2C_MASTER_SCL`, `UART_RX_PIN
 **Note:** There’s no need to add an external pull-up resistors for SDA/SCL pin, because the driver will enable the internal pull-up resistors.
 
 ## Build and Flash
-
 Enter `idf.py -p PORT flash monitor` to build, flash and monitor the project.
 
 (To exit the serial monitor, type ``Ctrl-]``.)
 
 See the [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/latest/get-started/index.html) for full steps to configure and use ESP-IDF to build projects.
+
+# License
+Unless specifically indicated otherwise in a file or a folder, files are licensed under the Apache License, Version 2.0 (check out LICENSE file).
